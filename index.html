@@ -100,13 +100,23 @@
       .card{padding:17px;border-radius:14px}.units,.form-grid,.calc-grid,.finance-results{grid-template-columns:1fr}.field.full,.form-grid>.form-grid.full{grid-column:auto}
       input,select{min-height:50px}.actions button{flex:1 1 calc(50% - 9px)}.actions .primary{flex-basis:100%}
       .metrics{grid-template-columns:1fr}.metric.featured,.metric.decomp{grid-column:auto}
-      .traditional-map{grid-template-columns:1fr 1fr;grid-template-areas:"top top" "land land" "left right" "bottom bottom"}.land-shape{height:130px}
+      .traditional-map{
+        grid-template-columns:minmax(72px,.8fr) minmax(100px,1.15fr) minmax(72px,.8fr);
+        grid-template-areas:"top top top" "left land right" "bottom bottom bottom";
+        gap:8px 6px
+      }
+      .traditional-map .top,.traditional-map .bottom{width:min(68%,220px);justify-self:center}
+      .traditional-map .left label,.traditional-map .right label{text-align:center;line-height:1.2}
+      .traditional-map .left input,.traditional-map .right input{padding-inline:8px;text-align:center}
+      .land-shape{height:125px}
       .point-row{grid-template-columns:34px minmax(0,1fr) minmax(0,1fr);align-items:center}.point-row button{grid-column:2/-1;width:100%}.point-head{display:none}
       .figure{min-height:270px;padding:10px}#figureSvg{height:245px}.result-head{align-items:flex-start;flex-direction:column}.history-item{grid-template-columns:1fr}.history-actions button{flex:1}
     }
     @media(max-width:360px){
       h1{font-size:2rem}.shell,.hero-inner{width:min(100% - 14px,1180px)}.card{padding:14px}.actions button{flex-basis:100%}
-      .traditional-map{grid-template-columns:1fr;grid-template-areas:"top" "land" "left" "right" "bottom"}
+      .traditional-map{grid-template-columns:minmax(68px,.8fr) minmax(88px,1.1fr) minmax(68px,.8fr);gap:7px 5px}
+      .traditional-map .top,.traditional-map .bottom{width:min(76%,210px)}
+      .land-shape{height:115px}
     }
     @page{size:A4;margin:14mm}
     @media print{
