@@ -1,0 +1,610 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#173f35">
+  <title>Cálculo de Terras</title>
+  <style>
+    :root{
+      --ink:#18312b;--muted:#60736e;--brand:#176b54;--brand2:#d9a441;--paper:#fffef9;
+      --bg:#f1f5ee;--line:#d7e0da;--danger:#a52d2d;--ok:#1e704e;--warn:#8a5a00;
+      --shadow:0 12px 34px rgba(30,61,51,.09);--radius:18px
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;overflow-x:hidden;background:linear-gradient(135deg,#edf4ee,#f7f3e8 60%,#edf4ee);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-tap-highlight-color:transparent}
+    button,input,select{font:inherit}
+    button,input,select,summary{outline-offset:3px}
+    :focus-visible{outline:3px solid #e4a92d}
+    .hero{background:linear-gradient(120deg,#123c32,#1f7158);color:white;padding:46px 20px 70px;position:relative;overflow:hidden}
+    .hero:after{content:"";position:absolute;width:330px;height:330px;border:1px solid #ffffff2c;border-radius:42% 58% 65% 35%;right:-70px;top:-130px;transform:rotate(20deg)}
+    .hero-inner,.shell{width:min(1180px,calc(100% - 28px));margin:auto}
+    .eyebrow{letter-spacing:.16em;text-transform:uppercase;font-size:.76rem;font-weight:800;color:#f2cd72}
+    h1{font-size:clamp(2.2rem,6vw,4.4rem);line-height:1;margin:.35rem 0 .8rem;letter-spacing:-.045em}
+    .hero p{max-width:720px;margin:0;color:#e2eee9;font-size:1.05rem}
+    .hero-badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+    .hero-badges span{padding:7px 11px;border:1px solid #ffffff42;border-radius:999px;background:#ffffff10;font-size:.85rem}
+    main{margin-top:-38px;position:relative}
+    .card{background:var(--paper);border:1px solid #e0e6df;border-radius:var(--radius);box-shadow:var(--shadow);padding:clamp(18px,3vw,30px);margin-bottom:20px}
+    .units{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .unit{background:#f4f7f1;border:1px solid var(--line);border-radius:14px;padding:15px}
+    .unit b{display:block;color:var(--brand);font-size:1.05rem}.unit small{color:var(--muted)}
+    h2{font-size:clamp(1.35rem,3vw,1.8rem);margin:0 0 7px;letter-spacing:-.025em}
+    h3{margin:0 0 12px}.intro{margin:0 0 20px;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(320px,.95fr);gap:20px}
+    .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    .form-grid>.form-grid.full{grid-column:1/-1}
+    .field{display:flex;flex-direction:column;gap:6px}
+    .field.full{grid-column:1/-1}
+    label{font-weight:700;font-size:.92rem}
+    input,select{width:100%;border:1px solid #b8c7c0;border-radius:11px;background:white;color:var(--ink);padding:12px 13px;min-height:48px}
+    input:focus,select:focus{border-color:var(--brand);box-shadow:0 0 0 3px #176b5420}
+    .hint{font-size:.83rem;color:var(--muted);margin:0}
+    .error{color:var(--danger);font-weight:700;min-height:1.5em;margin:10px 0 0}
+    .actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:18px}
+    button{border:0;border-radius:11px;padding:11px 16px;min-height:44px;font-weight:800;cursor:pointer;touch-action:manipulation}
+    button.primary{background:var(--brand);color:white}
+    button.secondary{background:#e6eee8;color:var(--ink)}
+    button.ghost{background:white;border:1px solid var(--line);color:var(--ink)}
+    button.danger{background:#f8e8e6;color:var(--danger)}
+    button:hover{filter:brightness(.96)}
+    .figure{min-height:320px;background:linear-gradient(#f3f7f3,#edf2ec);border:1px solid var(--line);border-radius:16px;display:grid;place-items:center;padding:16px;overflow:hidden}
+    #figureSvg{width:100%;height:290px}
+    .plot{fill:#dcebd8;stroke:#176b54;stroke-width:3;vector-effect:non-scaling-stroke}
+    .diag{stroke:#c28417;stroke-width:2.5;stroke-dasharray:8 6;vector-effect:non-scaling-stroke}
+    .vertex{fill:#fff;stroke:#176b54;stroke-width:2;vector-effect:non-scaling-stroke}
+    .svg-label{font:700 13px system-ui;fill:#173f35;paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
+    .measure-label{font-weight:900;fill:#125d49}
+    .unit-label{font:800 11px system-ui;fill:#60736e;letter-spacing:.04em;text-transform:uppercase}
+    .notice{padding:14px 16px;border-left:5px solid var(--brand2);background:#fff7df;border-radius:9px;color:#5d480e;margin-top:15px}
+    .notice strong{color:#503c05}.permanent{margin:20px 0;border-left-color:#8b5c13}
+    #polygonEditor{display:none;grid-column:1/-1}
+    .point-head,.point-row{display:grid;grid-template-columns:45px 1fr 1fr auto;gap:8px;align-items:end;margin-bottom:8px}
+    .point-head{font-size:.8rem;color:var(--muted);font-weight:800;align-items:center}
+    .point-row label{font-size:0}
+    .point-row button{padding:8px 11px}
+    #traditionalEditor{display:none;grid-column:1/-1}
+    .traditional-map{display:grid;grid-template-columns:minmax(100px,1fr) minmax(160px,1.4fr) minmax(100px,1fr);grid-template-areas:". top ." "left land right" ". bottom .";gap:10px;align-items:center}
+    .traditional-map .top{grid-area:top}.traditional-map .left{grid-area:left}.traditional-map .right{grid-area:right}.traditional-map .bottom{grid-area:bottom}
+    .land-shape{grid-area:land;height:150px;background:#dcebd8;border:3px solid var(--brand);clip-path:polygon(8% 13%,95% 4%,88% 92%,2% 82%);display:grid;place-items:center;font-weight:900;color:var(--brand)}
+    .result-card{display:none;border-top:7px solid var(--brand)}
+    .result-head{display:flex;justify-content:space-between;gap:15px;align-items:center;margin-bottom:18px}
+    .badge{display:inline-flex;align-items:center;border-radius:999px;padding:7px 11px;background:#dff2e8;color:var(--ok);font-weight:900;font-size:.84rem}
+    .badge.approx{background:#fff0cc;color:var(--warn)}
+    .metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+    .metric{padding:15px;border-radius:14px;background:#f1f6f2;border:1px solid var(--line);min-width:0}
+    .metric.featured{grid-column:span 2;background:var(--brand);color:white}
+    .metric .label{font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;opacity:.75;font-weight:800}
+    .metric .value{display:block;font-size:clamp(1.15rem,2.5vw,1.55rem);font-weight:900;line-height:1.25;overflow-wrap:anywhere}
+    .metric.decomp{grid-column:span 3;background:#fff7df}
+    .calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:16px}
+    .calc-box{background:#f7f8f4;border:1px solid var(--line);border-radius:13px;padding:16px}
+    .calc-box p{white-space:pre-line;margin:0;color:#344b44}
+    .finance-results{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:15px}
+    .financial-output{display:none}
+    details summary{font-size:1.12rem;font-weight:900;cursor:pointer}
+    details .content{margin-top:18px;color:#394d47}
+    .history-list{display:grid;gap:10px;margin-top:15px}
+    .history-item{display:grid;grid-template-columns:1fr auto;gap:15px;align-items:center;border:1px solid var(--line);border-radius:13px;padding:14px;background:#f8faf6}
+    .history-item p{margin:2px 0;color:var(--muted);font-size:.9rem}
+    .history-actions{display:flex;gap:7px;flex-wrap:wrap}
+    .empty{color:var(--muted);text-align:center;padding:22px}
+    .test-status{font-weight:800;margin-left:auto;align-self:center}
+    footer{text-align:center;padding:28px 20px 40px;color:#536a62}
+    .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:900px){.units{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,1fr)}.metric.featured,.metric.decomp{grid-column:span 2}.finance-results{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:580px){
+      .hero{padding:34px 0 58px}.hero p{font-size:1rem}.shell,.hero-inner{width:min(100% - 20px,1180px)}
+      .card{padding:17px;border-radius:14px}.units,.form-grid,.calc-grid,.finance-results{grid-template-columns:1fr}.field.full,.form-grid>.form-grid.full{grid-column:auto}
+      input,select{min-height:50px}.actions button{flex:1 1 calc(50% - 9px)}.actions .primary{flex-basis:100%}
+      .metrics{grid-template-columns:1fr}.metric.featured,.metric.decomp{grid-column:auto}
+      .traditional-map{grid-template-columns:1fr 1fr;grid-template-areas:"top top" "land land" "left right" "bottom bottom"}.land-shape{height:130px}
+      .point-row{grid-template-columns:34px minmax(0,1fr) minmax(0,1fr);align-items:center}.point-row button{grid-column:2/-1;width:100%}.point-head{display:none}
+      .figure{min-height:270px;padding:10px}#figureSvg{height:245px}.result-head{align-items:flex-start;flex-direction:column}.history-item{grid-template-columns:1fr}.history-actions button{flex:1}
+    }
+    @media(max-width:360px){
+      h1{font-size:2rem}.shell,.hero-inner{width:min(100% - 14px,1180px)}.card{padding:14px}.actions button{flex-basis:100%}
+      .traditional-map{grid-template-columns:1fr;grid-template-areas:"top" "land" "left" "right" "bottom"}
+    }
+    @page{size:A4;margin:14mm}
+    @media print{
+      body{background:white;color:#111;font-size:11pt}.hero{background:white;color:#111;padding:0 0 14px}.hero p{color:#333}.hero-badges,.units-card,.actions,.history-card,.test-card,.permanent,footer .screen-only{display:none!important}
+      main{margin:0}.shell,.hero-inner{width:100%}.card{box-shadow:none;border:1px solid #aaa;break-inside:avoid;padding:14px;margin:0 0 12px}.result-card{display:block!important}.figure{min-height:220px}.badge{border:1px solid #666}.print-only{display:block!important}
+    }
+    .print-only{display:none}
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="eyebrow">Medidas rurais locais</div>
+      <h1>CÁLCULO DE TERRAS</h1>
+      <p>Calcule áreas por figuras geométricas, diagonal, coordenadas ou pelo método tradicional, com conversões locais e memória completa.</p>
+      <div class="hero-badges"><span>Funciona offline</span><span>Dados ficam neste aparelho</span><span>Alqueire local: 48.400 m²</span></div>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="card units-card" aria-labelledby="unitsTitle">
+      <h2 id="unitsTitle">Equivalências adotadas</h2>
+      <p class="intro">Estas equivalências são fixas neste sistema e não representam outros padrões regionais de alqueire.</p>
+      <div class="units">
+        <div class="unit"><b>1 braça linear</b><small>2,20 metros</small></div>
+        <div class="unit"><b>1 quadrinho</b><small>1 braça² = 4,84 m²</small></div>
+        <div class="unit"><b>1 linha</b><small>625 quadrinhos = 3.025 m²</small></div>
+        <div class="unit"><b>1 alqueire local</b><small>16 linhas = 48.400 m²</small></div>
+      </div>
+    </section>
+
+    <section class="card controls-card" aria-labelledby="calcTitle">
+      <h2 id="calcTitle">Dados do terreno</h2>
+      <p class="intro">Escolha o método que corresponde às medidas disponíveis. Os campos e o desenho serão ajustados automaticamente.</p>
+      <div class="grid">
+        <div>
+          <div class="form-grid">
+            <div class="field full">
+              <label for="method">Formato ou método de cálculo</label>
+              <select id="method">
+                <option value="square">1. Quadrado</option>
+                <option value="rectangle">2. Retângulo</option>
+                <option value="triangleBH">3. Triângulo por base e altura</option>
+                <option value="triangleHeron">4. Triângulo pelos três lados — Heron</option>
+                <option value="trapezoid">5. Trapézio</option>
+                <option value="parallelogram">6. Paralelogramo</option>
+                <option value="rhombus">7. Losango</option>
+                <option value="quadDiagonal">8. Quadrilátero irregular pela diagonal</option>
+                <option value="polygon">9. Polígono irregular por coordenadas</option>
+                <option value="traditional">10. Método tradicional das médias</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="unit">Unidade das medidas</label>
+              <select id="unit"><option value="braca">Braças</option><option value="meter">Metros</option></select>
+            </div>
+            <div class="field">
+              <label for="decimals">Casas decimais exibidas</label>
+              <select id="decimals"><option>2</option><option>3</option><option selected>4</option><option>6</option></select>
+            </div>
+            <div id="dynamicFields" class="form-grid full"></div>
+            <div id="polygonEditor">
+              <p class="hint">Informe os pontos na ordem do contorno, no sentido horário ou anti-horário. O último será ligado ao primeiro.</p>
+              <div class="point-head"><span>Ponto</span><span>Coordenada X</span><span>Coordenada Y</span><span>Ação</span></div>
+              <div id="points"></div>
+              <button class="secondary" id="addPoint" type="button">Adicionar ponto</button>
+            </div>
+            <div id="traditionalEditor">
+              <div class="traditional-map">
+                <div class="field top"><label for="tradTop">Lado superior</label><input id="tradTop" inputmode="decimal" autocomplete="off"></div>
+                <div class="field left"><label for="tradLeft">Lado esquerdo</label><input id="tradLeft" inputmode="decimal" autocomplete="off"></div>
+                <div class="land-shape" aria-hidden="true">TERRENO</div>
+                <div class="field right"><label for="tradRight">Lado direito</label><input id="tradRight" inputmode="decimal" autocomplete="off"></div>
+                <div class="field bottom"><label for="tradBottom">Lado inferior</label><input id="tradBottom" inputmode="decimal" autocomplete="off"></div>
+              </div>
+              <div class="notice"><strong>Atenção:</strong> Este é um método tradicional aproximado. Somente as medidas dos quatro lados não são suficientes para determinar com exatidão a área de qualquer quadrilátero. Para um resultado matematicamente mais confiável, informe uma diagonal ou utilize as coordenadas dos vértices.</div>
+            </div>
+          </div>
+          <p id="methodHint" class="hint"></p>
+          <p id="formError" class="error" role="alert" aria-live="assertive"></p>
+          <div class="actions">
+            <button type="button" class="primary" id="calculate">Calcular</button>
+            <button type="button" class="secondary" id="example">Preencher exemplo</button>
+            <button type="button" class="ghost" id="clear">Limpar</button>
+            <button type="button" class="ghost" id="copy" disabled>Copiar resultado</button>
+            <button type="button" class="ghost" id="print" disabled>Imprimir relatório</button>
+            <button type="button" class="ghost" id="save" disabled>Salvar no histórico</button>
+          </div>
+        </div>
+        <div>
+          <h3>Representação da figura</h3>
+          <div class="figure">
+            <svg id="figureSvg" viewBox="0 0 420 290" role="img" aria-label="Desenho explicativo do terreno"></svg>
+          </div>
+          <p class="hint">O desenho é explicativo e pode não representar as proporções reais.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="results" class="card result-card" aria-live="polite" aria-labelledby="resultTitle">
+      <div class="result-head">
+        <div><div class="eyebrow" style="color:var(--brand)">Resultado calculado</div><h2 id="resultTitle">Área do terreno</h2></div>
+        <span id="accuracyBadge" class="badge">Resultado exato</span>
+      </div>
+      <div class="metrics">
+        <div class="metric featured"><span class="label">Metros quadrados</span><span id="m2Result" class="value">—</span></div>
+        <div class="metric"><span class="label">Braças quadradas</span><span id="braca2Result" class="value">—</span></div>
+        <div class="metric"><span class="label">Quadrinhos</span><span id="quadResult" class="value">—</span></div>
+        <div class="metric"><span class="label">Linhas (decimal)</span><span id="lineResult" class="value">—</span></div>
+        <div class="metric"><span class="label">Alqueires (decimal)</span><span id="alqResult" class="value">—</span></div>
+        <div class="metric decomp"><span class="label">Decomposição tradicional</span><span id="decompResult" class="value">—</span></div>
+      </div>
+      <div class="calc-grid">
+        <div class="calc-box"><h3>Fórmula e substituição</h3><p id="formulaResult"></p></div>
+        <div class="calc-box"><h3>Memória de cálculo</h3><p id="memoryResult"></p></div>
+      </div>
+      <p id="approxNotice" class="notice" hidden></p>
+      <div class="print-only"><strong>Data do relatório:</strong> <span id="printDate"></span><br><strong>Autor:</strong> Antônio Duda Oliveira da Silva</div>
+    </section>
+
+    <section class="card" aria-labelledby="financeTitle">
+      <h2 id="financeTitle">Avaliação do terreno <small style="font-size:.7em;color:var(--muted)">(opcional)</small></h2>
+      <p class="intro">O preço não interfere no cálculo da área. Escolha uma base e informe o valor em reais.</p>
+      <div class="form-grid">
+        <div class="field"><label for="priceBasis">Base do preço</label><select id="priceBasis"><option value="alqueire">Preço por alqueire</option><option value="linha">Preço por linha</option><option value="m2">Preço por metro quadrado</option></select></div>
+        <div class="field"><label for="price">Valor informado (R$)</label><input id="price" inputmode="decimal" placeholder="Ex.: 500,00" autocomplete="off"></div>
+      </div>
+      <p id="financeError" class="error" role="alert"></p>
+      <div id="financialOutput" class="financial-output">
+        <div class="finance-results">
+          <div class="metric"><span class="label">Por alqueire</span><span id="priceAlq" class="value">—</span></div>
+          <div class="metric"><span class="label">Por linha</span><span id="priceLine" class="value">—</span></div>
+          <div class="metric"><span class="label">Por quadrinho</span><span id="priceQuad" class="value">—</span></div>
+          <div class="metric featured" style="grid-column:auto"><span class="label">Valor total</span><span id="priceTotal" class="value">—</span></div>
+        </div>
+      </div>
+    </section>
+
+    <details class="card">
+      <summary>Como o cálculo funciona?</summary>
+      <div class="content">
+        <p><strong>Medida linear e área:</strong> braças e metros medem comprimentos. Braças quadradas e metros quadrados medem superfícies. Uma braça linear equivale a 2,20 m; por isso, uma braça quadrada — também chamada de quadrinho neste sistema — mede 2,20 × 2,20 = 4,84 m².</p>
+        <p><strong>Linha e alqueire local:</strong> 625 quadrinhos formam uma linha. Assim, 625 × 4,84 = 3.025 m². Dividir uma área em braças quadradas por 625, ou uma área em m² por 3.025, dá a quantidade de linhas. Dezesseis linhas formam um alqueire local: 10.000 quadrinhos ou 48.400 m².</p>
+        <p><strong>Escolha do método:</strong> base e altura, lados válidos, diagonal ou coordenadas determinam matematicamente as figuras correspondentes. Quatro lados isolados não determinam sempre uma área exata: ângulos diferentes podem produzir quadriláteros com áreas diferentes. Use as médias apenas como estimativa tradicional; use a diagonal quando ela dividir o terreno em dois triângulos medidos; prefira coordenadas para polígonos com vários lados retos.</p>
+        <p><strong>Limites curvos:</strong> polígonos de segmentos retos podem ser calculados pela fórmula das coordenadas, sem integrais. Limites curvos podem exigir levantamento topográfico mais detalhado, subdivisão, arcos, coordenadas adicionais ou métodos específicos.</p>
+      </div>
+    </details>
+
+    <section class="card history-card" aria-labelledby="historyTitle">
+      <div class="result-head"><div><h2 id="historyTitle">Histórico local</h2><p class="intro">Os registros ficam somente neste navegador.</p></div><button id="clearHistory" class="danger" type="button">Limpar todo o histórico</button></div>
+      <div id="historyList" class="history-list"></div>
+    </section>
+
+    <section class="card test-card" aria-labelledby="testTitle">
+      <div class="result-head"><div><h2 id="testTitle">Verificação do sistema</h2><p class="intro">Testes matemáticos internos também são executados ao abrir a página.</p></div><button id="runTests" class="ghost" type="button">Verificar cálculos</button></div>
+      <div id="testStatus" class="test-status" aria-live="polite">Aguardando verificação…</div>
+    </section>
+
+    <aside class="notice permanent"><strong>Observação importante:</strong> Este sistema é uma ferramenta de cálculo. Para demarcação oficial, compra e venda, registro de imóvel, georreferenciamento ou conflito de limites, utilize levantamento realizado por profissional legalmente habilitado.</aside>
+  </main>
+  <footer>Autor: Antônio Duda Oliveira da Silva</footer>
+
+  <script>
+  (() => {
+    "use strict";
+    const BRACA_M = 2.2, BRACA2_M2 = 4.84, QUAD_PER_LINE = 625, M2_PER_LINE = 3025, LINES_PER_ALQ = 16, M2_PER_ALQ = 48400;
+    const $ = id => document.getElementById(id);
+    const svgNS = "http://www.w3.org/2000/svg";
+    let currentResult = null;
+
+    const methods = {
+      square:{name:"Quadrado",fields:[["side","Medida do lado"]],formula:"A = lado²",hint:"Informe a medida de um lado do quadrado.",example:[25]},
+      rectangle:{name:"Retângulo",fields:[["length","Comprimento"],["width","Largura"]],formula:"A = comprimento × largura",hint:"Comprimento e largura devem ser perpendiculares.",example:[40,25]},
+      triangleBH:{name:"Triângulo por base e altura",fields:[["base","Base"],["height","Altura perpendicular"]],formula:"A = (base × altura) ÷ 2",hint:"A altura deve ser perpendicular à base.",example:[30,20]},
+      triangleHeron:{name:"Triângulo pelos três lados — Heron",fields:[["a","Lado A"],["b","Lado B"],["c","Lado C"]],formula:"s = (A + B + C) ÷ 2; área = √[s(s−A)(s−B)(s−C)]",hint:"Os três lados precisam satisfazer a desigualdade triangular.",example:[3,4,5],exampleUnit:"meter"},
+      trapezoid:{name:"Trapézio",fields:[["major","Base maior"],["minor","Base menor"],["height","Altura perpendicular"]],formula:"A = ((B + b) × h) ÷ 2",hint:"A altura deve ser perpendicular às bases.",example:[40,20,15]},
+      parallelogram:{name:"Paralelogramo",fields:[["base","Base"],["height","Altura perpendicular"]],formula:"A = base × altura",hint:"A altura deve ser perpendicular à base.",example:[30,18]},
+      rhombus:{name:"Losango",fields:[["major","Diagonal maior"],["minor","Diagonal menor"]],formula:"A = (D × d) ÷ 2",hint:"Informe as duas diagonais.",example:[30,20]},
+      quadDiagonal:{name:"Quadrilátero irregular pela diagonal",fields:[["a","Lado A"],["b","Lado B"],["c","Lado C"],["d","Lado D"],["diagonal","Diagonal interna"]],formula:"A = Heron(A,B,diagonal) + Heron(C,D,diagonal)",hint:"A diagonal deve formar dois triângulos: A–B–diagonal e C–D–diagonal.",example:[30,40,35,25,45]},
+      polygon:{name:"Polígono irregular por coordenadas",fields:[],formula:"A = ½ × |Σ(xᵢyᵢ₊₁ − yᵢxᵢ₊₁)|",hint:"Cadastre no mínimo três vértices diferentes na ordem do contorno.",example:[]},
+      traditional:{name:"Método tradicional das médias dos lados opostos",fields:[],formula:"A ≈ ((superior + inferior) ÷ 2) × ((esquerdo + direito) ÷ 2)",hint:"Estimativa regional: não substitui diagonal, coordenadas ou levantamento topográfico.",example:[200,300,200,250]}
+    };
+
+    function parseBR(value){
+      let s=String(value??"").trim().replace(/\s/g,"");
+      if(!s || !/^[+]?[0-9.,]+$/.test(s)) return NaN;
+      s=s.replace(/^\+/,"");
+      const comma=s.lastIndexOf(","), dot=s.lastIndexOf(".");
+      if(comma>=0 && dot>=0){
+        const dec=Math.max(comma,dot), int=s.slice(0,dec).replace(/[.,]/g,""), frac=s.slice(dec+1).replace(/[.,]/g,"");
+        s=int+"."+frac;
+      }else if(comma>=0) s=s.replace(/\./g,"").replace(",",".");
+      else if((s.match(/\./g)||[]).length>1) s=s.replace(/\./g,"");
+      const n=Number(s);
+      return Number.isFinite(n)?n:NaN;
+    }
+    function fmt(n,d=Number($("decimals").value||4)){return Number(n).toLocaleString("pt-BR",{minimumFractionDigits:d,maximumFractionDigits:d})}
+    function fmtSmart(n,d=Number($("decimals").value||4)){return Number(n).toLocaleString("pt-BR",{maximumFractionDigits:d})}
+    function money(n){return Number(n).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}
+    function linearToMeters(n,unit){return unit==="braca"?n*BRACA_M:n}
+    function nativeAreaToM2(area,unit){return unit==="braca"?area*BRACA2_M2:area}
+    function convertArea(m2){return {m2,braca2:m2/BRACA2_M2,quadrinhos:m2/BRACA2_M2,linhas:m2/M2_PER_LINE,alqueires:m2/M2_PER_ALQ}}
+    function decompose(m2){
+      const eps=1e-8;
+      let totalQuads=m2/BRACA2_M2;
+      let alqueires=Math.floor(totalQuads/(QUAD_PER_LINE*LINES_PER_ALQ)+eps);
+      totalQuads-=alqueires*QUAD_PER_LINE*LINES_PER_ALQ;
+      let linhas=Math.floor(totalQuads/QUAD_PER_LINE+eps);
+      let quadrinhos=totalQuads-linhas*QUAD_PER_LINE;
+      if(Math.abs(quadrinhos-Math.round(quadrinhos))<eps) quadrinhos=Math.round(quadrinhos);
+      quadrinhos=Number(quadrinhos.toFixed(8));
+      if(quadrinhos>=QUAD_PER_LINE-eps){quadrinhos=0;linhas++}
+      if(linhas>=LINES_PER_ALQ){linhas=0;alqueires++}
+      const parts=[];
+      if(alqueires) parts.push(`${fmtSmart(alqueires)} ${alqueires===1?"alqueire":"alqueires"}`);
+      if(linhas) parts.push(`${fmtSmart(linhas)} ${linhas===1?"linha":"linhas"}`);
+      if(quadrinhos || !parts.length) parts.push(`${fmtSmart(quadrinhos)} ${quadrinhos===1?"quadrinho":"quadrinhos"}`);
+      return {alqueires,linhas,quadrinhos,text:parts.join(", ").replace(/, ([^,]*)$/," e $1")};
+    }
+    function validTriangle(a,b,c){return [a,b,c].every(n=>n>0&&Number.isFinite(n))&&a+b>c&&a+c>b&&b+c>a}
+    function heron(a,b,c){
+      if(!validTriangle(a,b,c)) throw new Error("As medidas não formam um triângulo válido.");
+      const s=(a+b+c)/2, rad=s*(s-a)*(s-b)*(s-c);
+      return {area:Math.sqrt(Math.max(0,rad)),s};
+    }
+    function shoelace(points){
+      let sum=0;
+      for(let i=0;i<points.length;i++){const p=points[i],q=points[(i+1)%points.length];sum+=p.x*q.y-p.y*q.x}
+      return Math.abs(sum)/2;
+    }
+    function perimeter(points){let p=0;for(let i=0;i<points.length;i++){const a=points[i],b=points[(i+1)%points.length];p+=Math.hypot(b.x-a.x,b.y-a.y)}return p}
+    function orientation(a,b,c){const v=(b.y-a.y)*(c.x-b.x)-(b.x-a.x)*(c.y-b.y);return Math.abs(v)<1e-10?0:(v>0?1:2)}
+    function onSegment(a,b,c){return b.x<=Math.max(a.x,c.x)+1e-10&&b.x>=Math.min(a.x,c.x)-1e-10&&b.y<=Math.max(a.y,c.y)+1e-10&&b.y>=Math.min(a.y,c.y)-1e-10}
+    function segmentsIntersect(p1,q1,p2,q2){
+      const o1=orientation(p1,q1,p2),o2=orientation(p1,q1,q2),o3=orientation(p2,q2,p1),o4=orientation(p2,q2,q1);
+      if(o1!==o2&&o3!==o4)return true;
+      return (o1===0&&onSegment(p1,p2,q1))||(o2===0&&onSegment(p1,q2,q1))||(o3===0&&onSegment(p2,p1,q2))||(o4===0&&onSegment(p2,q1,q2));
+    }
+    function validatePolygon(points){
+      if(points.length<3) return "Informe pelo menos três pontos.";
+      const keys=points.map(p=>`${p.x}|${p.y}`);if(new Set(keys).size!==keys.length)return "Existem pontos repetidos. Cada vértice deve ser diferente.";
+      if(shoelace(points)<1e-10)return "Os pontos não formam uma área válida.";
+      const n=points.length;
+      for(let i=0;i<n;i++)for(let j=i+1;j<n;j++){
+        if(j===i||j===(i+1)%n||i===(j+1)%n)continue;
+        if(segmentsIntersect(points[i],points[(i+1)%n],points[j],points[(j+1)%n]))return "O polígono possui lados que se cruzam. Informe os pontos na ordem correta do contorno.";
+      }
+      return "";
+    }
+    function readPositive(id,label){
+      const n=parseBR($(id).value);
+      if(!Number.isFinite(n))throw new Error(`Informe um número válido para “${label}”.`);
+      if(n<=0)throw new Error(`“${label}” deve ser maior que zero.`);
+      return n;
+    }
+    function renderFields(){
+      const key=$("method").value,m=methods[key],box=$("dynamicFields");
+      box.replaceChildren();
+      $("polygonEditor").style.display=key==="polygon"?"block":"none";
+      $("traditionalEditor").style.display=key==="traditional"?"block":"none";
+      m.fields.forEach(([id,label])=>{
+        const wrap=document.createElement("div");wrap.className="field";
+        const lab=document.createElement("label");lab.htmlFor=`measure_${id}`;lab.textContent=label;
+        const input=document.createElement("input");input.id=`measure_${id}`;input.inputMode="decimal";input.autocomplete="off";input.dataset.label=label;
+        input.addEventListener("input",updateDrawing);wrap.append(lab,input);box.append(wrap);
+      });
+      $("methodHint").textContent=m.hint;
+      $("formError").textContent="";currentResult=null;toggleResultActions(false);$("results").style.display="none";
+      if(key==="polygon"&&$("points").children.length<3){$("points").replaceChildren();for(let i=0;i<4;i++)addPoint()}
+      updateDrawing();
+    }
+    function addPoint(x="",y=""){
+      const row=document.createElement("div");row.className="point-row";
+      const num=document.createElement("strong");num.className="point-number";
+      const lx=document.createElement("label"),ly=document.createElement("label"),ix=document.createElement("input"),iy=document.createElement("input"),remove=document.createElement("button");
+      ix.inputMode=iy.inputMode="decimal";ix.autocomplete=iy.autocomplete="off";ix.className="px";iy.className="py";
+      ix.value=x;iy.value=y;lx.append(ix);ly.append(iy);remove.type="button";remove.className="danger";remove.textContent="Remover";remove.setAttribute("aria-label","Remover ponto");
+      [ix,iy].forEach(el=>el.addEventListener("input",updateDrawing));remove.addEventListener("click",()=>{row.remove();renumberPoints();updateDrawing()});
+      row.append(num,lx,ly,remove);$("points").append(row);renumberPoints();
+    }
+    function renumberPoints(){
+      [...$("points").children].forEach((r,i)=>{r.querySelector(".point-number").textContent=`P${i+1}`;r.querySelector(".px").setAttribute("aria-label",`Coordenada X do ponto ${i+1}`);r.querySelector(".py").setAttribute("aria-label",`Coordenada Y do ponto ${i+1}`);r.querySelector("button").setAttribute("aria-label",`Remover ponto ${i+1}`)});
+    }
+    function readPoints(strict=true){
+      return [...$("points").children].map((r,i)=>{
+        const x=parseBR(r.querySelector(".px").value),y=parseBR(r.querySelector(".py").value);
+        if(strict&&(!Number.isFinite(x)||!Number.isFinite(y)))throw new Error(`Informe X e Y válidos para o ponto ${i+1}.`);
+        return {x,y};
+      }).filter(p=>Number.isFinite(p.x)&&Number.isFinite(p.y));
+    }
+    function calculateNative(){
+      const key=$("method").value,m=methods[key],vals={};
+      if(key==="polygon"){
+        const points=readPoints(),err=validatePolygon(points);if(err)throw new Error(err);
+        const area=shoelace(points),perim=perimeter(points);
+        return {nativeArea:area,values:{points},substitution:`A = ½ × |Σ produtos cruzados| = ${fmtSmart(area)} ${unitAreaLabel()}`,memory:`Fórmula do cadarço aplicada a ${points.length} vértices.\nÁrea na unidade de entrada: ${fmtSmart(area)} ${unitAreaLabel()}.\nPerímetro: ${fmtSmart(perim)} ${unitLinearLabel()}.`,perimeter:perim};
+      }
+      if(key==="traditional"){
+        const top=readPositive("tradTop","Lado superior"),right=readPositive("tradRight","Lado direito"),bottom=readPositive("tradBottom","Lado inferior"),left=readPositive("tradLeft","Lado esquerdo");
+        const h=(top+bottom)/2,v=(left+right)/2,area=h*v;
+        return {nativeArea:area,values:{top,right,bottom,left},substitution:`A ≈ ((${fmtSmart(top)} + ${fmtSmart(bottom)}) ÷ 2) × ((${fmtSmart(left)} + ${fmtSmart(right)}) ÷ 2)\nA ≈ ${fmtSmart(h)} × ${fmtSmart(v)} = ${fmtSmart(area)} ${unitAreaLabel()}`,memory:`Média superior/inferior: ${fmtSmart(h)} ${unitLinearLabel()}.\nMédia esquerdo/direito: ${fmtSmart(v)} ${unitLinearLabel()}.\nÁrea tradicional aproximada: ${fmtSmart(area)} ${unitAreaLabel()}.`,approximate:true};
+      }
+      m.fields.forEach(([id,label])=>vals[id]=readPositive(`measure_${id}`,label));
+      let area,sub,memory;
+      switch(key){
+        case"square":area=vals.side**2;sub=`A = ${fmtSmart(vals.side)}² = ${fmtSmart(area)} ${unitAreaLabel()}`;break;
+        case"rectangle":area=vals.length*vals.width;sub=`A = ${fmtSmart(vals.length)} × ${fmtSmart(vals.width)} = ${fmtSmart(area)} ${unitAreaLabel()}`;break;
+        case"triangleBH":area=vals.base*vals.height/2;sub=`A = (${fmtSmart(vals.base)} × ${fmtSmart(vals.height)}) ÷ 2 = ${fmtSmart(area)} ${unitAreaLabel()}`;break;
+        case"triangleHeron":{
+          const h=heron(vals.a,vals.b,vals.c);area=h.area;sub=`s = (${fmtSmart(vals.a)} + ${fmtSmart(vals.b)} + ${fmtSmart(vals.c)}) ÷ 2 = ${fmtSmart(h.s)}\nA = √[${fmtSmart(h.s)} × (${fmtSmart(h.s)}−${fmtSmart(vals.a)}) × (${fmtSmart(h.s)}−${fmtSmart(vals.b)}) × (${fmtSmart(h.s)}−${fmtSmart(vals.c)})] = ${fmtSmart(area)} ${unitAreaLabel()}`;break;
+        }
+        case"trapezoid":area=(vals.major+vals.minor)*vals.height/2;sub=`A = ((${fmtSmart(vals.major)} + ${fmtSmart(vals.minor)}) × ${fmtSmart(vals.height)}) ÷ 2 = ${fmtSmart(area)} ${unitAreaLabel()}`;break;
+        case"parallelogram":area=vals.base*vals.height;sub=`A = ${fmtSmart(vals.base)} × ${fmtSmart(vals.height)} = ${fmtSmart(area)} ${unitAreaLabel()}`;break;
+        case"rhombus":area=vals.major*vals.minor/2;sub=`A = (${fmtSmart(vals.major)} × ${fmtSmart(vals.minor)}) ÷ 2 = ${fmtSmart(area)} ${unitAreaLabel()}`;break;
+        case"quadDiagonal":{
+          let h1,h2;try{h1=heron(vals.a,vals.b,vals.diagonal)}catch(e){throw new Error("O triângulo formado pelos lados A, B e diagonal não pode existir.")}
+          try{h2=heron(vals.c,vals.d,vals.diagonal)}catch(e){throw new Error("O triângulo formado pelos lados C, D e diagonal não pode existir.")}
+          area=h1.area+h2.area;sub=`A₁ = Heron(${fmtSmart(vals.a)}, ${fmtSmart(vals.b)}, ${fmtSmart(vals.diagonal)}) = ${fmtSmart(h1.area)}\nA₂ = Heron(${fmtSmart(vals.c)}, ${fmtSmart(vals.d)}, ${fmtSmart(vals.diagonal)}) = ${fmtSmart(h2.area)}\nA = A₁ + A₂ = ${fmtSmart(area)} ${unitAreaLabel()}`;break;
+        }
+      }
+      memory=`Área na unidade de entrada: ${fmtSmart(area)} ${unitAreaLabel()}.\nConversão: ${$("unit").value==="braca"?`${fmtSmart(area)} × 4,84`:`mantida em metros quadrados`} = ${fmt(nativeAreaToM2(area,$("unit").value))} m².`;
+      return {nativeArea:area,values:vals,substitution:sub,memory};
+    }
+    function unitLinearLabel(){return $("unit").value==="braca"?"braças":"m"}
+    function unitAreaLabel(){return $("unit").value==="braca"?"braças² (quadrinhos)":"m²"}
+    function calculate(){
+      try{
+        $("formError").textContent="";
+        const calc=calculateNative(),m2=nativeAreaToM2(calc.nativeArea,$("unit").value);
+        if(!(m2>0)||!Number.isFinite(m2))throw new Error("O cálculo não produziu uma área válida.");
+        const converted=convertArea(m2),decomp=decompose(m2);
+        currentResult={date:new Date().toISOString(),methodKey:$("method").value,method:methods[$("method").value].name,unit:$("unit").value,values:calc.values,formula:methods[$("method").value].formula,substitution:calc.substitution,memory:calc.memory,approximate:!!calc.approximate,perimeter:calc.perimeter,...converted,decomp};
+        renderResult();updateFinance();updateDrawing();toggleResultActions(true);
+      }catch(err){$("formError").textContent=err.message;$("results").style.display="none";currentResult=null;toggleResultActions(false)}
+    }
+    function renderResult(){
+      const r=currentResult,d=Number($("decimals").value);
+      $("m2Result").textContent=`${fmt(r.m2,d)} m²`;$("braca2Result").textContent=`${fmt(r.braca2,d)} braças²`;$("quadResult").textContent=fmt(r.quadrinhos,d);
+      $("lineResult").textContent=fmt(r.linhas,d);$("alqResult").textContent=fmt(r.alqueires,d);$("decompResult").textContent=r.decomp.text;
+      $("formulaResult").textContent=`${r.formula}\n\n${r.substitution}`;$("memoryResult").textContent=`${r.memory}\n\n${fmt(r.m2,d)} ÷ 4,84 = ${fmt(r.quadrinhos,d)} quadrinhos.\n${fmt(r.m2,d)} ÷ 3.025 = ${fmt(r.linhas,d)} linhas.\n${fmt(r.m2,d)} ÷ 48.400 = ${fmt(r.alqueires,d)} alqueires.\nResultado ${r.approximate?"aproximado":"exato"} dentro dos dados e do método informados.`;
+      $("accuracyBadge").textContent=r.approximate?"Resultado aproximado":"Resultado exato";$("accuracyBadge").className=`badge${r.approximate?" approx":""}`;
+      $("approxNotice").hidden=!r.approximate;$("approxNotice").textContent=r.approximate?"Este resultado é uma estimativa pelo método tradicional e não deve ser tratado como levantamento topográfico oficial.":"";
+      $("printDate").textContent=new Date().toLocaleString("pt-BR");$("results").style.display="block";
+    }
+    function toggleResultActions(enabled){["copy","print","save"].forEach(id=>$(id).disabled=!enabled)}
+    function updateFinance(){
+      $("financeError").textContent="";const raw=$("price").value.trim();
+      if(!currentResult||!raw){$("financialOutput").style.display="none";if(currentResult)currentResult.finance=null;return}
+      const value=parseBR(raw);if(!(value>0)){ $("financeError").textContent="Informe um preço maior que zero ou deixe o campo vazio.";$("financialOutput").style.display="none";currentResult.finance=null;return}
+      const basis=$("priceBasis").value;
+      const perAlq=basis==="alqueire"?value:basis==="linha"?value*16:value*M2_PER_ALQ;
+      const perLine=perAlq/16,perQuad=perLine/625,total=currentResult.alqueires*perAlq;
+      currentResult.finance={basis,value,perAlq,perLine,perQuad,total};
+      $("priceAlq").textContent=money(perAlq);$("priceLine").textContent=money(perLine);$("priceQuad").textContent=money(perQuad);$("priceTotal").textContent=money(total);$("financialOutput").style.display="block";
+    }
+    function svgEl(name,attrs={},text=""){const el=document.createElementNS(svgNS,name);Object.entries(attrs).forEach(([k,v])=>el.setAttribute(k,v));if(text)el.textContent=text;return el}
+    function diagramNumber(value){
+      const n=parseBR(value);
+      return Number.isFinite(n)?fmtSmart(n,Math.min(3,Number($("decimals").value||3))):"—";
+    }
+    function diagramValue(id,label){
+      const input=$(id);
+      return `${label}: ${diagramNumber(input?input.value:"")} ${unitLinearLabel()}`;
+    }
+    function addSvgLabel(svg,x,y,text,anchor="middle",extra={}){
+      svg.append(svgEl("text",{x,y,"text-anchor":anchor,class:"svg-label measure-label",...extra},text));
+    }
+    function addEdgeLabel(svg,a,b,text,centroid=[210,145],distance=16){
+      const mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2,dx=b[0]-a[0],dy=b[1]-a[1],length=Math.hypot(dx,dy)||1;
+      let nx=-dy/length,ny=dx/length;
+      if(nx*(mx-centroid[0])+ny*(my-centroid[1])<0){nx=-nx;ny=-ny}
+      addSvgLabel(svg,mx+nx*distance,my+ny*distance,text);
+    }
+    function updateDrawing(){
+      const svg=$("figureSvg");svg.replaceChildren();const key=$("method").value;
+      let pts,labels=[],diagonal=null;
+      const shapes={
+        square:[[100,45],[320,45],[320,245],[100,245]],rectangle:[[55,70],[365,70],[365,225],[55,225]],triangleBH:[[70,235],[350,235],[235,45]],
+        triangleHeron:[[65,235],[355,235],[155,45]],trapezoid:[[110,55],[310,55],[370,235],[50,235]],parallelogram:[[120,55],[365,55],[300,235],[55,235]],
+        rhombus:[[210,35],[365,145],[210,255],[55,145]],quadDiagonal:[[75,80],[300,45],[360,220],[110,245]]
+      };
+      if(key==="polygon"){
+        const raw=readPoints(false);if(raw.length>=2){
+          const xs=raw.map(p=>p.x),ys=raw.map(p=>p.y),minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys),sx=300/(maxX-minX||1),sy=200/(maxY-minY||1),scale=Math.min(sx,sy);
+          pts=raw.map(p=>[60+(p.x-minX)*scale,250-(p.y-minY)*scale]);
+          labels=raw.map((p,i)=>raw.length<=8?`P${i+1} (${diagramNumber(p.x)}; ${diagramNumber(p.y)})`:`P${i+1}`);
+        }
+      }else if(key==="traditional"){pts=[[70,65],[350,50],[330,235],[55,220]]}
+      else{pts=shapes[key]||shapes.square;if(key==="quadDiagonal")diagonal=[pts[0],pts[2]]}
+      if(!pts||pts.length<2){svg.append(svgEl("text",{x:210,y:145,"text-anchor":"middle",class:"svg-label"},"Informe os pontos para visualizar"));return}
+      svg.setAttribute("aria-label",`Representação de ${methods[key].name}, com medidas em ${unitLinearLabel()}`);
+      svg.append(svgEl("polygon",{points:pts.map(p=>p.join(",")).join(" "),class:"plot"}));
+      if(key==="triangleBH")svg.append(svgEl("line",{x1:235,y1:45,x2:235,y2:235,class:"diag"}));
+      if(key==="trapezoid")svg.append(svgEl("line",{x1:310,y1:55,x2:310,y2:235,class:"diag"}));
+      if(key==="parallelogram")svg.append(svgEl("line",{x1:120,y1:55,x2:120,y2:235,class:"diag"}));
+      if(key==="rhombus"){svg.append(svgEl("line",{x1:55,y1:145,x2:365,y2:145,class:"diag"}));svg.append(svgEl("line",{x1:210,y1:35,x2:210,y2:255,class:"diag"}))}
+      if(diagonal)svg.append(svgEl("line",{x1:diagonal[0][0],y1:diagonal[0][1],x2:diagonal[1][0],y2:diagonal[1][1],class:"diag"}));
+      pts.forEach((p,i)=>{svg.append(svgEl("circle",{cx:p[0],cy:p[1],r:5,class:"vertex"}));if(labels[i])svg.append(svgEl("text",{x:p[0]+8,y:p[1]-8,class:"svg-label"},labels[i]))});
+      svg.append(svgEl("text",{x:12,y:18,class:"unit-label"},`UNIDADE: ${unitLinearLabel()}`));
+      if(key==="square")addEdgeLabel(svg,pts[0],pts[1],diagramValue("measure_side","Lado"));
+      if(key==="rectangle"){addEdgeLabel(svg,pts[0],pts[1],diagramValue("measure_length","Comprimento"));addSvgLabel(svg,350,150,diagramValue("measure_width","Largura"),"end")}
+      if(key==="triangleBH"){addEdgeLabel(svg,pts[0],pts[1],diagramValue("measure_base","Base"));addSvgLabel(svg,245,145,diagramValue("measure_height","Altura"),"start")}
+      if(key==="triangleHeron"){
+        addEdgeLabel(svg,pts[0],pts[2],diagramValue("measure_a","A"));
+        addEdgeLabel(svg,pts[2],pts[1],diagramValue("measure_b","B"));
+        addEdgeLabel(svg,pts[1],pts[0],diagramValue("measure_c","C"));
+      }
+      if(key==="trapezoid"){addEdgeLabel(svg,pts[0],pts[1],diagramValue("measure_minor","Base menor"));addEdgeLabel(svg,pts[2],pts[3],diagramValue("measure_major","Base maior"));addSvgLabel(svg,315,145,diagramValue("measure_height","Altura"),"end")}
+      if(key==="parallelogram"){addEdgeLabel(svg,pts[2],pts[3],diagramValue("measure_base","Base"));addSvgLabel(svg,295,145,diagramValue("measure_height","Altura"),"end")}
+      if(key==="rhombus"){addSvgLabel(svg,210,132,diagramValue("measure_major","Diagonal maior"));addSvgLabel(svg,218,82,diagramValue("measure_minor","Diagonal menor"),"start")}
+      if(key==="quadDiagonal"){
+        ["a","b","c","d"].forEach((id,i)=>addEdgeLabel(svg,pts[i],pts[(i+1)%4],diagramValue(`measure_${id}`,id.toUpperCase())));
+        addSvgLabel(svg,220,135,diagramValue("measure_diagonal","Diagonal"));
+      }
+      if(key==="traditional"){
+        const ids=[["tradTop","Superior"],["tradRight","Direito"],["tradBottom","Inferior"],["tradLeft","Esquerdo"]];
+        ids.forEach(([id,label],i)=>addEdgeLabel(svg,pts[i],pts[(i+1)%4],diagramValue(id,label)));
+      }
+      if(key==="polygon"){
+        const raw=readPoints(false);
+        if(raw.length===pts.length&&raw.length<=8)raw.forEach((p,i)=>{
+          const q=raw[(i+1)%raw.length],length=Math.hypot(q.x-p.x,q.y-p.y);
+          addEdgeLabel(svg,pts[i],pts[(i+1)%pts.length],`L${i+1}: ${diagramNumber(length)} ${unitLinearLabel()}`,[210,145],12);
+        });
+      }
+    }
+    function fillExample(){
+      const key=$("method").value,m=methods[key];if(m.exampleUnit)$("unit").value=m.exampleUnit;
+      if(key==="polygon"){$("points").replaceChildren();[[0,0],[25,0],[25,25],[0,25]].forEach(p=>addPoint(p[0],p[1]))}
+      else if(key==="traditional"){["tradTop","tradRight","tradBottom","tradLeft"].forEach((id,i)=>$(id).value=m.example[i])}
+      else m.fields.forEach(([id],i)=>$(`measure_${id}`).value=m.example[i]);
+      $("formError").textContent="";updateDrawing();
+    }
+    function clearForm(){
+      document.querySelectorAll("#dynamicFields input,#traditionalEditor input").forEach(i=>i.value="");
+      if($("method").value==="polygon"){$("points").replaceChildren();for(let i=0;i<3;i++)addPoint()}
+      $("formError").textContent="";$("financeError").textContent="";$("price").value="";$("results").style.display="none";$("financialOutput").style.display="none";currentResult=null;toggleResultActions(false);updateDrawing();
+    }
+    function resultText(){
+      const r=currentResult;return `CÁLCULO DE TERRAS\n${r.method} — ${r.approximate?"Resultado aproximado":"Resultado exato"}\nÁrea: ${fmt(r.m2)} m²\nBraças quadradas: ${fmt(r.braca2)}\nQuadrinhos: ${fmt(r.quadrinhos)}\nLinhas: ${fmt(r.linhas)}\nAlqueires: ${fmt(r.alqueires)}\nDecomposição: ${r.decomp.text}\nFórmula: ${r.formula}\n${r.substitution}${r.finance?`\nValor total: ${money(r.finance.total)}`:""}\nAutor: Antônio Duda Oliveira da Silva`;
+    }
+    async function copyResult(){
+      try{await navigator.clipboard.writeText(resultText())}catch(e){const ta=document.createElement("textarea");ta.value=resultText();document.body.append(ta);ta.select();document.execCommand("copy");ta.remove()}
+      const old=$("copy").textContent;$("copy").textContent="Resultado copiado";setTimeout(()=>$("copy").textContent=old,1600);
+    }
+    function historyData(){try{const d=JSON.parse(localStorage.getItem("calculoTerrasHistorico")||"[]");return Array.isArray(d)?d:[]}catch(e){return[]}}
+    function saveHistory(){
+      if(!currentResult)return;updateFinance();const data=historyData();data.unshift(typeof structuredClone==="function"?structuredClone(currentResult):JSON.parse(JSON.stringify(currentResult)));localStorage.setItem("calculoTerrasHistorico",JSON.stringify(data.slice(0,50)));renderHistory();
+      const old=$("save").textContent;$("save").textContent="Salvo";setTimeout(()=>$("save").textContent=old,1500);
+    }
+    function renderHistory(){
+      const list=$("historyList"),data=historyData();list.replaceChildren();
+      if(!data.length){const e=document.createElement("div");e.className="empty";e.textContent="Nenhum cálculo salvo.";list.append(e);return}
+      data.forEach((r,i)=>{
+        const item=document.createElement("article");item.className="history-item";const info=document.createElement("div"),title=document.createElement("strong"),p=document.createElement("p"),actions=document.createElement("div"),load=document.createElement("button"),del=document.createElement("button");
+        title.textContent=`${r.method} — ${fmt(r.m2,2)} m²`;p.textContent=`${new Date(r.date).toLocaleString("pt-BR")} • ${r.decomp.text}${r.finance?` • ${money(r.finance.total)}`:""}`;
+        actions.className="history-actions";load.className="secondary";load.textContent="Recarregar";del.className="danger";del.textContent="Excluir";
+        load.addEventListener("click",()=>loadHistory(r));del.addEventListener("click",()=>{const d=historyData();d.splice(i,1);localStorage.setItem("calculoTerrasHistorico",JSON.stringify(d));renderHistory()});
+        info.append(title,p);actions.append(load,del);item.append(info,actions);list.append(item);
+      });
+    }
+    function loadHistory(r){
+      $("method").value=r.methodKey;$("unit").value=r.unit;renderFields();
+      if(r.methodKey==="polygon"){ $("points").replaceChildren();r.values.points.forEach(p=>addPoint(p.x,p.y))}
+      else if(r.methodKey==="traditional"){const map={top:"tradTop",right:"tradRight",bottom:"tradBottom",left:"tradLeft"};Object.entries(r.values).forEach(([k,v])=>$(map[k]).value=fmtSmart(v,6))}
+      else Object.entries(r.values).forEach(([k,v])=>{const el=$(`measure_${k}`);if(el)el.value=fmtSmart(v,6)});
+      if(r.finance){$("priceBasis").value=r.finance.basis;$("price").value=fmtSmart(r.finance.value,2)}
+      calculate();window.scrollTo({top:$("calcTitle").offsetTop,behavior:"smooth"});
+    }
+    function close(a,b,t=1e-8){return Math.abs(a-b)<=t*Math.max(1,Math.abs(a),Math.abs(b))}
+    function runTests(){
+      const tests=[],test=(name,fn)=>{try{if(!fn())throw new Error();tests.push({name,ok:true})}catch(e){tests.push({name,ok:false})}};
+      test("Quadrado de 25 braças",()=>close(nativeAreaToM2(25**2,"braca"),3025));
+      test("Quadrado de 100 braças",()=>close(nativeAreaToM2(100**2,"braca"),48400));
+      test("Triângulo 3–4–5",()=>close(heron(3,4,5).area,6));
+      const traditional=(t,r,b,l)=>((t+b)/2)*((l+r)/2);
+      test("Tradicional — caso 1",()=>close(traditional(25,25,25,25),625));
+      test("Tradicional — caso 2",()=>close(traditional(100,100,100,100),10000));
+      test("Tradicional — caso 3",()=>close(traditional(200,100,200,400),50000)&&close(nativeAreaToM2(50000,"braca"),242000));
+      test("Tradicional — caso 4",()=>close(traditional(200,300,200,250),55000)&&close(convertArea(nativeAreaToM2(55000,"braca")).alqueires,5.5));
+      test("Tradicional — caso 5",()=>close(traditional(200,150,120,250),32000)&&decompose(nativeAreaToM2(32000,"braca")).quadrinhos===125);
+      test("Polígono 25 × 25 braças",()=>close(shoelace([{x:0,y:0},{x:25,y:0},{x:25,y:25},{x:0,y:25}]),625));
+      test("625 braças² = 3.025 m²",()=>close(nativeAreaToM2(625,"braca"),3025));
+      test("16 linhas = 1 alqueire",()=>close(16*M2_PER_LINE/M2_PER_ALQ,1));
+      test("5,5 alqueires a R$ 500",()=>close(5.5*500,2750));
+      test("Leitura de vírgula e milhar",()=>parseBR("25,5")===25.5&&parseBR("1.250,75")===1250.75&&parseBR("1250.75")===1250.75);
+      const failed=tests.filter(t=>!t.ok);$("testStatus").textContent=failed.length?`${failed.length} de ${tests.length} testes falharam: ${failed.map(t=>t.name).join(", ")}.`:`Todos os ${tests.length} testes foram aprovados.`;$("testStatus").style.color=failed.length?"var(--danger)":"var(--ok)";
+      return {total:tests.length,failed:failed.length,tests};
+    }
+    $("method").addEventListener("change",renderFields);$("unit").addEventListener("change",()=>{currentResult&&calculate();updateDrawing()});$("decimals").addEventListener("change",()=>{if(currentResult)renderResult();renderHistory();updateDrawing()});
+    $("calculate").addEventListener("click",calculate);$("example").addEventListener("click",fillExample);$("clear").addEventListener("click",clearForm);$("addPoint").addEventListener("click",()=>addPoint());$("copy").addEventListener("click",copyResult);$("print").addEventListener("click",()=>window.print());$("save").addEventListener("click",saveHistory);
+    $("price").addEventListener("input",updateFinance);$("priceBasis").addEventListener("change",updateFinance);$("runTests").addEventListener("click",runTests);
+    $("clearHistory").addEventListener("click",()=>{if(confirm("Excluir todos os cálculos salvos neste navegador?")){localStorage.removeItem("calculoTerrasHistorico");renderHistory()}});
+    ["tradTop","tradRight","tradBottom","tradLeft"].forEach(id=>$(id).addEventListener("input",updateDrawing));
+    window.addEventListener("beforeprint",()=>{$("printDate").textContent=new Date().toLocaleString("pt-BR")});
+    renderFields();renderHistory();runTests();
+    window.CalculoTerrasTests={parseBR,convertArea,decompose,heron,shoelace,perimeter,validatePolygon,runTests};
+  })();
+  </script>
+</body>
+</html>
