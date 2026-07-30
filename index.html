@@ -78,7 +78,7 @@
     .metric.featured{grid-column:span 2;background:var(--brand);color:white}
     .metric .label{font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;opacity:.75;font-weight:800}
     .metric .value{display:block;font-size:clamp(1.15rem,2.5vw,1.55rem);font-weight:900;line-height:1.25;overflow-wrap:anywhere}
-    .metric.decomp{grid-column:span 3;background:#fff7df}
+    .metric.decomp{grid-column:1/-1}
     .calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:16px}
     .calc-box{background:#f7f8f4;border:1px solid var(--line);border-radius:13px;padding:16px}
     .calc-box p{white-space:pre-line;margin:0;color:#344b44}
@@ -222,12 +222,12 @@
         <span id="accuracyBadge" class="badge">Resultado exato</span>
       </div>
       <div class="metrics">
-        <div class="metric featured"><span class="label">Metros quadrados</span><span id="m2Result" class="value">—</span></div>
+        <div class="metric featured decomp"><span class="label">Decomposição tradicional</span><span id="decompResult" class="value">—</span></div>
+        <div class="metric"><span class="label">Metros quadrados</span><span id="m2Result" class="value">—</span></div>
         <div class="metric"><span class="label">Braças quadradas</span><span id="braca2Result" class="value">—</span></div>
         <div class="metric"><span class="label">Quadrinhos</span><span id="quadResult" class="value">—</span></div>
         <div class="metric"><span class="label">Linhas (decimal)</span><span id="lineResult" class="value">—</span></div>
         <div class="metric"><span class="label">Alqueires (decimal)</span><span id="alqResult" class="value">—</span></div>
-        <div class="metric decomp"><span class="label">Decomposição tradicional</span><span id="decompResult" class="value">—</span></div>
       </div>
       <div class="calc-grid">
         <div class="calc-box"><h3>Fórmula e substituição</h3><p id="formulaResult"></p></div>
