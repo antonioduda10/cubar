@@ -69,12 +69,38 @@
     .point-head,.point-row{display:grid;grid-template-columns:45px 1fr 1fr auto;gap:8px;align-items:end;margin-bottom:8px}
     .point-head{font-size:.8rem;color:var(--muted);font-weight:800;align-items:center}
     .point-row label{font-size:0}
+    .point-row input{font-size:1rem;text-align:center}
     .point-row button{padding:8px 11px}
+    .figure-fields{
+      grid-template-columns:minmax(105px,1fr) minmax(150px,1.35fr) minmax(105px,1fr);
+      grid-template-areas:"top top top" "left shape right" "bottomLeft bottom bottomRight";
+      gap:10px;align-items:center
+    }
+    .figure-fields .field label,.figure-fields .field input{text-align:center}
+    .figure-fields .pos-top{grid-area:top;width:min(58%,230px);justify-self:center}
+    .figure-fields .pos-left{grid-area:left}
+    .figure-fields .pos-right{grid-area:right}
+    .figure-fields .pos-bottom{grid-area:bottom;width:min(100%,230px);justify-self:center}
+    .figure-fields .pos-bottom-left{grid-area:bottomLeft}
+    .figure-fields .pos-bottom-right{grid-area:bottomRight}
+    .figure-fields .pos-center{grid-area:shape;z-index:1;width:min(82%,155px);justify-self:center}
+    .figure-fields .pos-center input{background:#fffffff2}
+    .input-shape{
+      grid-area:shape;width:100%;height:150px;background:#dcebd8;border:3px solid var(--brand);
+      display:grid;place-items:center;color:var(--brand);font-size:.82rem;font-weight:900;text-align:center
+    }
+    .input-shape.square{width:min(100%,150px);justify-self:center}
+    .input-shape.triangleBH,.input-shape.triangleHeron{clip-path:polygon(50% 3%,98% 96%,2% 96%)}
+    .input-shape.trapezoid{clip-path:polygon(24% 4%,76% 4%,98% 96%,2% 96%)}
+    .input-shape.parallelogram{clip-path:polygon(25% 4%,100% 4%,75% 96%,0 96%)}
+    .input-shape.rhombus{clip-path:polygon(50% 2%,98% 50%,50% 98%,2% 50%)}
+    .input-shape.quadDiagonal{clip-path:polygon(8% 16%,80% 3%,98% 85%,18% 98%)}
     #traditionalEditor{display:none;grid-column:1/-1}
     .traditional-map{display:grid;grid-template-columns:minmax(100px,1fr) minmax(160px,1.4fr) minmax(100px,1fr);grid-template-areas:". top ." "left land right" ". bottom .";gap:10px;align-items:center}
     .traditional-map .top{grid-area:top}.traditional-map .left{grid-area:left}.traditional-map .right{grid-area:right}.traditional-map .bottom{grid-area:bottom}
+    .traditional-map .field label,.traditional-map .field input{text-align:center}
     .land-shape{grid-area:land;height:150px;background:#dcebd8;border:3px solid var(--brand);clip-path:polygon(8% 13%,95% 4%,88% 92%,2% 82%);display:grid;place-items:center;font-weight:900;color:var(--brand)}
-    .result-card{display:none;border-top:7px solid var(--brand)}
+    .result-card{display:none;border-top:7px solid var(--brand);scroll-margin-top:12px}
     .result-head{display:flex;justify-content:space-between;gap:15px;align-items:center;margin-bottom:18px}
     .badge{display:inline-flex;align-items:center;border-radius:999px;padding:7px 11px;background:#dff2e8;color:var(--ok);font-weight:900;font-size:.84rem}
     .badge.approx{background:#fff0cc;color:var(--warn)}
@@ -115,6 +141,11 @@
       .traditional-map .top,.traditional-map .bottom{width:min(68%,220px);justify-self:center}
       .traditional-map .left label,.traditional-map .right label{text-align:center;line-height:1.2}
       .traditional-map .left input,.traditional-map .right input{padding-inline:8px;text-align:center}
+      .figure-fields{grid-template-columns:minmax(72px,.8fr) minmax(100px,1.15fr) minmax(72px,.8fr);gap:8px 6px}
+      .figure-fields .pos-top{width:min(68%,220px)}
+      .figure-fields .pos-left label,.figure-fields .pos-right label,.figure-fields .pos-bottom-left label,.figure-fields .pos-bottom-right label{line-height:1.2}
+      .figure-fields .pos-left input,.figure-fields .pos-right input,.figure-fields .pos-bottom-left input,.figure-fields .pos-bottom-right input{padding-inline:8px}
+      .input-shape{height:125px}
       .land-shape{height:125px}
       .point-row{grid-template-columns:34px minmax(0,1fr) minmax(0,1fr);align-items:center}.point-row button{grid-column:2/-1;width:100%}.point-head{display:none}
       .figure{min-height:270px;padding:10px}#figureSvg{height:245px}.result-head{align-items:flex-start;flex-direction:column}.history-item{grid-template-columns:1fr}.history-actions button{flex:1}
@@ -125,7 +156,9 @@
       #calculate{padding:12px 16px}
       .traditional-map{grid-template-columns:minmax(68px,.8fr) minmax(88px,1.1fr) minmax(68px,.8fr);gap:7px 5px}
       .traditional-map .top,.traditional-map .bottom{width:min(76%,210px)}
-      .land-shape{height:115px}
+      .figure-fields{grid-template-columns:minmax(68px,.8fr) minmax(88px,1.1fr) minmax(68px,.8fr);gap:7px 5px}
+      .figure-fields .pos-top{width:min(76%,210px)}
+      .input-shape,.land-shape{height:115px}
     }
     @page{size:A4;margin:14mm}
     @media print{
@@ -225,7 +258,7 @@
       </div>
     </section>
 
-    <section id="results" class="card result-card" aria-live="polite" aria-labelledby="resultTitle">
+    <section id="results" class="card result-card" tabindex="-1" aria-live="polite" aria-labelledby="resultTitle">
       <div class="result-head">
         <div><div class="eyebrow" style="color:var(--brand)">Resultado calculado</div><h2 id="resultTitle">Área do terreno</h2></div>
         <span id="accuracyBadge" class="badge">Resultado exato</span>
@@ -308,18 +341,32 @@
       polygon:{name:"Polígono irregular por coordenadas",fields:[],formula:"A = ½ × |Σ(xᵢyᵢ₊₁ − yᵢxᵢ₊₁)|",hint:"Cadastre no mínimo três vértices diferentes na ordem do contorno.",example:[]},
       traditional:{name:"Método tradicional das médias dos lados opostos",fields:[],formula:"A ≈ ((superior + inferior) ÷ 2) × ((esquerdo + direito) ÷ 2)",hint:"Estimativa regional: não substitui diagonal, coordenadas ou levantamento topográfico.",example:[200,300,200,250]}
     };
+    const fieldLayouts = {
+      square:{side:"top"},
+      rectangle:{length:"top",width:"right"},
+      triangleBH:{base:"bottom",height:"right"},
+      triangleHeron:{a:"left",b:"right",c:"bottom"},
+      trapezoid:{minor:"top",major:"bottom",height:"right"},
+      parallelogram:{base:"bottom",height:"right"},
+      rhombus:{major:"bottom",minor:"right"},
+      quadDiagonal:{a:"top",b:"right",c:"bottom",d:"left",diagonal:"center"}
+    };
+    const shapeTitles = {
+      square:"QUADRADO",rectangle:"RETÂNGULO",triangleBH:"TRIÂNGULO",triangleHeron:"TRIÂNGULO",
+      trapezoid:"TRAPÉZIO",parallelogram:"PARALELOGRAMO",rhombus:"LOSANGO",quadDiagonal:"QUADRILÁTERO"
+    };
 
     function parseBR(value){
       let s=String(value??"").trim().replace(/\s/g,"");
-      if(!s || !/^[+]?[0-9.,]+$/.test(s)) return NaN;
-      s=s.replace(/^\+/,"");
+      if(!s || !/^[+-]?[0-9.,]+$/.test(s)) return NaN;
+      const sign=s.startsWith("-")?-1:1;s=s.replace(/^[+-]/,"");
       const comma=s.lastIndexOf(","), dot=s.lastIndexOf(".");
       if(comma>=0 && dot>=0){
         const dec=Math.max(comma,dot), int=s.slice(0,dec).replace(/[.,]/g,""), frac=s.slice(dec+1).replace(/[.,]/g,"");
         s=int+"."+frac;
       }else if(comma>=0) s=s.replace(/\./g,"").replace(",",".");
       else if((s.match(/\./g)||[]).length>1) s=s.replace(/\./g,"");
-      const n=Number(s);
+      const n=Number(s)*sign;
       return Number.isFinite(n)?n:NaN;
     }
     function fmt(n,d=Number($("decimals").value||2)){return Number(n).toLocaleString("pt-BR",{minimumFractionDigits:d,maximumFractionDigits:d})}
@@ -384,14 +431,21 @@
     function renderFields(){
       const key=$("method").value,m=methods[key],box=$("dynamicFields");
       box.replaceChildren();
+      const layout=fieldLayouts[key]||{},showFigure=m.fields.length>0&&key!=="polygon";
+      box.className=`form-grid full${showFigure?" figure-fields":""}`;
       $("polygonEditor").style.display=key==="polygon"?"block":"none";
       $("traditionalEditor").style.display=key==="traditional"?"block":"none";
       m.fields.forEach(([id,label])=>{
-        const wrap=document.createElement("div");wrap.className="field";
+        const wrap=document.createElement("div");wrap.className=`field pos-${layout[id]||"bottom"}`;
         const lab=document.createElement("label");lab.htmlFor=`measure_${id}`;lab.textContent=label;
         const input=document.createElement("input");input.id=`measure_${id}`;input.inputMode="decimal";input.autocomplete="off";input.dataset.label=label;
         input.addEventListener("input",updateDrawing);wrap.append(lab,input);box.append(wrap);
       });
+      if(showFigure){
+        const shape=document.createElement("div");
+        shape.className=`input-shape ${key}`;shape.textContent=shapeTitles[key]||methods[key].name.toUpperCase();shape.setAttribute("aria-hidden","true");
+        box.append(shape);
+      }
       $("methodHint").textContent=m.hint;
       $("formError").textContent="";currentResult=null;toggleResultActions(false);$("results").style.display="none";
       if(key==="polygon"&&$("points").children.length<3){$("points").replaceChildren();for(let i=0;i<4;i++)addPoint()}
@@ -402,6 +456,7 @@
       const num=document.createElement("strong");num.className="point-number";
       const lx=document.createElement("label"),ly=document.createElement("label"),ix=document.createElement("input"),iy=document.createElement("input"),remove=document.createElement("button");
       ix.inputMode=iy.inputMode="decimal";ix.autocomplete=iy.autocomplete="off";ix.className="px";iy.className="py";
+      ix.placeholder="X";iy.placeholder="Y";
       ix.value=x;iy.value=y;lx.append(ix);ly.append(iy);remove.type="button";remove.className="danger";remove.textContent="Remover";remove.setAttribute("aria-label","Remover ponto");
       [ix,iy].forEach(el=>el.addEventListener("input",updateDrawing));remove.addEventListener("click",()=>{row.remove();renumberPoints();updateDrawing()});
       row.append(num,lx,ly,remove);$("points").append(row);renumberPoints();
@@ -451,7 +506,7 @@
     }
     function unitLinearLabel(){return $("unit").value==="braca"?"braças":"m"}
     function unitAreaLabel(){return $("unit").value==="braca"?"braças² (quadrinhos)":"m²"}
-    function calculate(){
+    function calculate(scrollToResult=false){
       try{
         $("formError").textContent="";
         const calc=calculateNative(),m2=nativeAreaToM2(calc.nativeArea,$("unit").value);
@@ -459,6 +514,7 @@
         const converted=convertArea(m2),decomp=decompose(m2);
         currentResult={date:new Date().toISOString(),methodKey:$("method").value,method:methods[$("method").value].name,unit:$("unit").value,values:calc.values,formula:methods[$("method").value].formula,substitution:calc.substitution,memory:calc.memory,approximate:!!calc.approximate,perimeter:calc.perimeter,...converted,decomp};
         renderResult();updateFinance();updateDrawing();toggleResultActions(true);
+        if(scrollToResult)requestAnimationFrame(()=>{$("results").scrollIntoView({behavior:"smooth",block:"start"});$("results").focus({preventScroll:true})});
       }catch(err){$("formError").textContent=err.message;$("results").style.display="none";currentResult=null;toggleResultActions(false)}
     }
     function renderResult(){
@@ -612,11 +668,12 @@
       test("16 linhas = 1 alqueire",()=>close(16*M2_PER_LINE/M2_PER_ALQ,1));
       test("5,5 alqueires a R$ 500",()=>close(5.5*500,2750));
       test("Leitura de vírgula e milhar",()=>parseBR("25,5")===25.5&&parseBR("1.250,75")===1250.75&&parseBR("1250.75")===1250.75);
+      test("Coordenada negativa",()=>parseBR("-25,5")===-25.5&&parseBR("-1.250,75")===-1250.75);
       const failed=tests.filter(t=>!t.ok);$("testStatus").textContent=failed.length?`${failed.length} de ${tests.length} testes falharam: ${failed.map(t=>t.name).join(", ")}.`:`Todos os ${tests.length} testes foram aprovados.`;$("testStatus").style.color=failed.length?"var(--danger)":"var(--ok)";
       return {total:tests.length,failed:failed.length,tests};
     }
     $("method").addEventListener("change",renderFields);$("unit").addEventListener("change",()=>{currentResult&&calculate();updateDrawing()});$("decimals").addEventListener("change",()=>{if(currentResult)renderResult();renderHistory();updateDrawing()});
-    $("calculate").addEventListener("click",calculate);$("example").addEventListener("click",fillExample);$("clear").addEventListener("click",clearForm);$("addPoint").addEventListener("click",()=>addPoint());$("copy").addEventListener("click",copyResult);$("print").addEventListener("click",()=>window.print());$("save").addEventListener("click",saveHistory);
+    $("calculate").addEventListener("click",()=>calculate(true));$("example").addEventListener("click",fillExample);$("clear").addEventListener("click",clearForm);$("addPoint").addEventListener("click",()=>addPoint());$("copy").addEventListener("click",copyResult);$("print").addEventListener("click",()=>window.print());$("save").addEventListener("click",saveHistory);
     $("price").addEventListener("input",updateFinance);$("priceBasis").addEventListener("change",updateFinance);$("runTests").addEventListener("click",runTests);
     $("clearHistory").addEventListener("click",()=>{if(confirm("Excluir todos os cálculos salvos neste navegador?")){localStorage.removeItem("calculoTerrasHistorico");renderHistory()}});
     ["tradTop","tradRight","tradBottom","tradLeft"].forEach(id=>$(id).addEventListener("input",updateDrawing));
