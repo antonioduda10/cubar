@@ -24,6 +24,9 @@
     .eyebrow{letter-spacing:.16em;text-transform:uppercase;font-size:.76rem;font-weight:800;color:#f2cd72}
     h1{font-size:clamp(2.2rem,6vw,4.4rem);line-height:1;margin:.35rem 0 .8rem;letter-spacing:-.045em}
     .hero p{max-width:720px;margin:0;color:#e2eee9;font-size:1.05rem}
+    .hero-author{position:absolute;right:20px;bottom:14px;margin:0;display:inline-flex;align-items:flex-end;gap:2px;font-family:inherit;font-size:.85rem;font-weight:400;line-height:1.2;color:#e2eee9;letter-spacing:0;text-align:right;white-space:nowrap}
+    .hero-label{font-size:.8rem;font-style:italic;letter-spacing:-.02em}
+    .hero-signature{display:inline-block;margin-left:0;font-family:"Edwardian Script ITC","Snell Roundhand","Lucida Handwriting","Segoe Script",cursive;font-size:1.18em;font-weight:400;font-style:italic;letter-spacing:.015em;line-height:1;color:#f7f0d1;text-shadow:0 1px 0 rgba(0,0,0,.2),0 2px 6px rgba(0,0,0,.12);transform:translateY(1px) rotate(-2deg);text-transform:none}
     .hero-badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
     .hero-badges span{padding:7px 11px;border:1px solid #ffffff42;border-radius:999px;background:#ffffff10;font-size:.85rem}
     main{margin-top:-38px;position:relative}
@@ -128,6 +131,7 @@
     @media(max-width:900px){.units{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,1fr)}.metric.featured,.metric.decomp{grid-column:span 2}.finance-results{grid-template-columns:repeat(2,1fr)}}
     @media(max-width:580px){
       .hero{padding:34px 0 58px}.hero p{font-size:1rem}.shell,.hero-inner{width:min(100% - 20px,1180px)}
+      .hero-author{right:10px;bottom:10px;font-size:.85rem}
       .card{padding:17px;border-radius:14px}.units,.form-grid,.calc-grid,.finance-results{grid-template-columns:1fr}.field.full,.form-grid>.form-grid.full{grid-column:auto}
       input,select{min-height:50px}.actions button{flex:1 1 calc(50% - 9px)}
       #calculate{bottom:8px;padding:13px 18px}
@@ -172,7 +176,8 @@
       <div class="eyebrow">Medidas rurais locais</div>
       <h1>CÁLCULO DE TERRAS</h1>
       <p>Calcule áreas por figuras geométricas, diagonal, coordenadas ou pelo método tradicional, com conversões locais e memória completa.</p>
-      <div class="hero-badges"><span>Funciona offline</span><span>Dados ficam neste aparelho</span><span>Alqueire local: 48.400 m²</span></div>
+      <div class="hero-badges"><span>Dados ficam neste aparelho</span><span>Alqueire local: 48.400 m²</span></div>
+      <p class="hero-author"><span class="hero-label">Autor:</span> <span class="hero-signature">Antônio Duda</span></p>
     </div>
   </header>
 
@@ -317,7 +322,7 @@
 
     <aside class="notice permanent"><strong>Observação importante:</strong> Este sistema é uma ferramenta de cálculo. Para demarcação oficial, compra e venda, registro de imóvel, georreferenciamento ou conflito de limites, utilize levantamento realizado por profissional legalmente habilitado.</aside>
   </main>
-  <footer>Autor: Antônio Duda Oliveira da Silva</footer>
+
 
   <script>
   (() => {
