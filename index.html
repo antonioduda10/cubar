@@ -112,7 +112,10 @@
     .metric.featured{grid-column:span 2;background:var(--brand);color:white}
     .metric .label{font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;opacity:.75;font-weight:800}
     .metric .value{display:block;font-size:clamp(1.15rem,2.5vw,1.55rem);font-weight:900;line-height:1.25;overflow-wrap:anywhere}
-    .metric.decomp{grid-column:1/-1}
+    .metric.decomp{grid-column:1/-1;padding:22px 20px;text-align:center;color:#173f35;background:linear-gradient(135deg,#fffbea 0%,#ffe7a3 55%,#f2c858 100%);border:3px solid #d29a1d;box-shadow:0 13px 30px rgba(138,90,0,.24)}
+    .metric.decomp .result-kicker{display:inline-flex;align-items:center;justify-content:center;padding:6px 12px;border-radius:999px;background:#173f35;color:white;font-size:.75rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+    .metric.decomp .label{display:block;margin:10px 0 4px;color:#704c08;opacity:1;font-size:.86rem}
+    .metric.decomp .value{color:#173f35;font-size:clamp(1.65rem,4vw,2.4rem);line-height:1.15;letter-spacing:-.025em;text-wrap:balance}
     .calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:16px}
     .calc-box{background:#f7f8f4;border:1px solid var(--line);border-radius:13px;padding:16px}
     .calc-box p{white-space:pre-line;margin:0;color:#344b44}
@@ -138,6 +141,8 @@
       input,select{min-height:50px}.actions button{flex:1 1 calc(50% - 9px)}
       #calculate{bottom:8px;padding:13px 18px}
       .metrics{grid-template-columns:1fr}.metric.featured,.metric.decomp{grid-column:auto}
+      .metric.decomp{padding:22px 14px;border-width:3px;box-shadow:0 14px 32px rgba(138,90,0,.3)}
+      .metric.decomp .value{font-size:clamp(1.55rem,7vw,2.1rem)}
       .traditional-map{
         grid-template-columns:minmax(72px,.8fr) minmax(100px,1.15fr) minmax(72px,.8fr);
         grid-template-areas:"top top top" "left land right" "bottom bottom bottom";
@@ -269,7 +274,7 @@
         <span id="accuracyBadge" class="badge">Resultado exato</span>
       </div>
       <div class="metrics">
-        <div class="metric featured decomp"><span class="label">Decomposição tradicional</span><span id="decompResult" class="value">—</span></div>
+        <div class="metric featured decomp"><span class="result-kicker">Resultado principal</span><span class="label">Decomposição tradicional</span><span id="decompResult" class="value">—</span></div>
         <div class="metric"><span class="label">Metros quadrados</span><span id="m2Result" class="value">—</span></div>
         <div class="metric"><span class="label">Braças quadradas</span><span id="braca2Result" class="value">—</span></div>
         <div class="metric"><span class="label">Quadrinhos</span><span id="quadResult" class="value">—</span></div>
